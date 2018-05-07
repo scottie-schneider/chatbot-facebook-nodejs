@@ -1,16 +1,25 @@
 'use strict';
-// hello world
+// DialogFlow SDK
 const apiai = require('apiai');
+// pulling in the config file for keys
 const config = require('./config');
+// pulling in the express framework
 const express = require('express');
+// required for verifying request signatureHash
+// TODO explain this better
 const crypto = require('crypto');
+// parses request data
 const bodyParser = require('body-parser');
+// for making requests
 const request = require('request');
+// creating the app with express
 const app = express();
+// Universal Unique identifier module
 const uuid = require('uuid');
 
 
 // Messenger API parameters
+// throws an error if theyre not set
 if (!config.FB_PAGE_TOKEN) {
 	throw new Error('missing FB_PAGE_TOKEN');
 }
@@ -28,10 +37,10 @@ if (!config.SERVER_URL) { //used for ink to static files
 }
 
 
-
+// sets the port to 5000
 app.set('port', (process.env.PORT || 5000))
 
-//verify request came from facebook
+// verify request came from facebook
 app.use(bodyParser.json({
 	verify: verifyRequestSignature
 }));
@@ -39,7 +48,7 @@ app.use(bodyParser.json({
 //serve static files in the public directory
 app.use(express.static('public'));
 
-// Process application/x-www-form-urlencoded
+// Process application/x-www-form-urlencoded ie., parses requests
 app.use(bodyParser.urlencoded({
 	extended: false
 }))
@@ -49,11 +58,12 @@ app.use(bodyParser.json())
 
 
 
-
+// connecting to DialogFlow
 const apiAiService = apiai(config.API_AI_CLIENT_ACCESS_TOKEN, {
 	language: "en",
 	requestSource: "fb"
 });
+// TODO understand how this is utilized
 const sessionIds = new Map();
 
 // Index route
@@ -834,6 +844,7 @@ function receivedAuthentication(event) {
  * https://developers.facebook.com/docs/graph-api/webhooks#setup
  *
  */
+ // serves to verify the request is coming from facebook. Called on line 44
 function verifyRequestSignature(req, res, buf) {
 	var signature = req.headers["x-hub-signature"];
 
